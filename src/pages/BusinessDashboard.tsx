@@ -423,9 +423,9 @@ const BusinessDashboard = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  <img 
-                    src="/lovable-uploads/1910766d-1a88-4097-bfa3-5a488dc54bdc.png" 
-                    alt="TimeLine Logo" 
+                  <img
+                    src="/logo.png"
+                    alt="TimeLine Logo"
                     className="w-12 h-12 rounded-2xl shadow-luxury"
                   />
                   <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-accent rounded-full flex items-center justify-center">

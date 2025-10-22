@@ -165,9 +165,9 @@ const BusinessLogin = () => {
 
         <Card className="shadow-strong border-0">
           <CardHeader className="text-center">
-            <img 
-              src="/lovable-uploads/1910766d-1a88-4097-bfa3-5a488dc54bdc.png" 
-              alt="TimeLine Logo" 
+            <img
+              src="/logo.png"
+              alt="TimeLine Logo"
               className="w-16 h-16 mx-auto mb-4"
             />
             <CardTitle className="text-2xl">
