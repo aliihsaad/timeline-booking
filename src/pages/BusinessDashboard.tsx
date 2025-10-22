@@ -42,12 +42,16 @@ import { businessService } from "@/lib/business";
 import { appointmentService } from "@/lib/appointments";
 import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/theme-toggle";
+import type { Database } from "@/integrations/supabase/types";
 
 type Mode = "queue" | "appointments" | "both";
+type Business = Database['public']['Tables']['businesses']['Row'];
+type Appointment = Database['public']['Tables']['appointments']['Row'];
+type TimeSlot = Database['public']['Tables']['time_slots']['Row'];
 
 const BusinessDashboard = () => {
   const [activeMode, setActiveMode] = useState<Mode>("appointments");
-  const [business, setBusiness] = useState<any>(null);
+  const [business, setBusiness] = useState<Business | null>(null);
   const [stats, setStats] = useState({
     today: 0,
     thisWeek: 0,
@@ -55,13 +59,13 @@ const BusinessDashboard = () => {
     completed: 0,
     cancelled: 0,
   });
-  const [todayAppointments, setTodayAppointments] = useState<any[]>([]);
-  const [allAppointments, setAllAppointments] = useState<any[]>([]);
+  const [todayAppointments, setTodayAppointments] = useState<Appointment[]>([]);
+  const [allAppointments, setAllAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCalendarDialog, setShowCalendarDialog] = useState(false);
   const [showAddAppointmentDialog, setShowAddAppointmentDialog] = useState(false);
   const [showAllAppointmentsDialog, setShowAllAppointmentsDialog] = useState(false);
-  const [timeSlots, setTimeSlots] = useState<any[]>([]);
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
   const [newAppointment, setNewAppointment] = useState({
     customer_name: '',
@@ -173,9 +177,9 @@ const BusinessDashboard = () => {
     }
   };
 
-  const updateAppointmentStatus = async (appointmentId: string, newStatus: string) => {
+  const updateAppointmentStatus = async (appointmentId: string, newStatus: Appointment['status']) => {
     try {
-      const { error } = await appointmentService.updateAppointmentStatus(appointmentId, newStatus as any);
+      const { error } = await appointmentService.updateAppointmentStatus(appointmentId, newStatus);
       
       if (error) {
         toast({
