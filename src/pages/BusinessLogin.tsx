@@ -166,9 +166,9 @@ const BusinessLogin = () => {
         <Card className="shadow-strong border-0">
           <CardHeader className="text-center">
             <img
-              src="/logo.png"
+              src="/timeline-logo-alt.png"
               alt="TimeLine Logo"
-              className="w-16 h-16 mx-auto mb-4"
+              className="w-24 h-24 mx-auto mb-4"
             />
             <CardTitle className="text-2xl">
               {isSignUp ? "Create Business Account" : "Business Login"}

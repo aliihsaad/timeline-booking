@@ -15,58 +15,101 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-status">
       {/* Hero Section */}
-      <header className="relative w-full min-h-screen overflow-hidden bg-black">
-        {/* Background video */}
-        <video
-          className="absolute inset-0 h-full w-full object-contain"
-          src="https://cbvykjzlckghiyzcvsus.supabase.co/storage/v1/object/public/Hero/Untitled%20design.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-        />
+      <header className="relative w-full min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+        {/* Animated background pattern */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
+        </div>
 
-        {/* Premium Animated Sign In Button */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
-          <Link to="/business/login">
-            <div className="group relative">
-              {/* Outer glow ring */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 rounded-full opacity-75 group-hover:opacity-100 transition-all duration-1000 group-hover:duration-200 animate-pulse group-hover:animate-none blur-sm"></div>
-              
-              {/* Animated border gradient */}
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-spin-slow"></div>
-              
-              {/* Main button */}
-              <button className="relative px-12 py-4 bg-gradient-to-r from-gray-900 via-black to-gray-900 rounded-full text-white font-bold text-xl tracking-wide transform transition-all duration-300 group-hover:scale-110 group-hover:shadow-2xl group-hover:shadow-purple-500/50">
-                
-                {/* Inner gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-full"></div>
-                
-                {/* Shimmer effect */}
-                <div className="absolute inset-0 -top-2 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
-                
-                {/* Button content */}
-                <span className="relative flex items-center gap-3 z-10">
-                  <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent group-hover:from-pink-400 group-hover:to-cyan-400 transition-all duration-500">
-                    Sign In
-                  </span>
-                  <div className="transform transition-transform duration-300 group-hover:translate-x-2 group-hover:scale-110">
-                    <svg className="w-6 h-6 text-blue-400 group-hover:text-purple-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </div>
-                </span>
-                
-                {/* Floating particles effect */}
-                <div className="absolute inset-0 overflow-hidden rounded-full">
-                  <div className="absolute top-2 left-4 w-1 h-1 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping"></div>
-                  <div className="absolute top-4 right-6 w-1 h-1 bg-purple-400 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style={{animationDelay: '0.3s'}}></div>
-                  <div className="absolute bottom-3 left-8 w-1 h-1 bg-pink-400 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style={{animationDelay: '0.6s'}}></div>
-                </div>
-              </button>
+        {/* Gradient orbs */}
+        <div className="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-0 -right-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+
+        {/* Content Container */}
+        <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-20">
+          {/* Logo */}
+          <div className="mb-8 transform hover:scale-105 transition-transform duration-300">
+            <img
+              src="/timeline-logo-alt.png"
+              alt="TimeLine Logo"
+              className="w-48 h-48 md:w-64 md:h-64 drop-shadow-2xl"
+            />
+          </div>
+
+          {/* Main Heading */}
+          <div className="text-center max-w-4xl mx-auto mb-12">
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
+              Simplify Your
+              <span className="block bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Appointment Scheduling
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-blue-100 leading-relaxed max-w-2xl mx-auto">
+              The modern booking platform that helps businesses manage appointments effortlessly while delighting customers
+            </p>
+          </div>
+
+          {/* Feature Pills */}
+          <div className="flex flex-wrap justify-center gap-3 mb-12">
+            <Badge className="bg-white/10 backdrop-blur-sm text-white border-white/20 px-4 py-2 text-sm hover:bg-white/20 transition-colors">
+              <CheckCircle className="w-4 h-4 mr-2 text-cyan-400" />
+              24/7 Online Booking
+            </Badge>
+            <Badge className="bg-white/10 backdrop-blur-sm text-white border-white/20 px-4 py-2 text-sm hover:bg-white/20 transition-colors">
+              <CheckCircle className="w-4 h-4 mr-2 text-cyan-400" />
+              Real-Time Updates
+            </Badge>
+            <Badge className="bg-white/10 backdrop-blur-sm text-white border-white/20 px-4 py-2 text-sm hover:bg-white/20 transition-colors">
+              <CheckCircle className="w-4 h-4 mr-2 text-cyan-400" />
+              No Setup Fees
+            </Badge>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <Link to="/business/login">
+              <Button
+                size="lg"
+                className="group relative px-8 py-6 text-lg font-semibold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 transform hover:scale-105"
+              >
+                <Building2 className="w-5 h-5 mr-2" />
+                Get Started Free
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+
+            <Link to="/my-appointments">
+              <Button
+                size="lg"
+                variant="outline"
+                className="px-8 py-6 text-lg font-semibold border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm transition-all duration-300"
+              >
+                <Calendar className="w-5 h-5 mr-2" />
+                View My Bookings
+              </Button>
+            </Link>
+          </div>
+
+          {/* Trust indicator */}
+          <div className="mt-16 text-center">
+            <p className="text-sm text-blue-200/80 mb-3">Trusted by businesses worldwide</p>
+            <div className="flex items-center justify-center gap-2">
+              <div className="flex -space-x-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 border-2 border-white/20"></div>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 border-2 border-white/20"></div>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 border-2 border-white/20"></div>
+              </div>
+              <span className="text-sm text-blue-200 ml-2">Join 1000+ businesses</span>
             </div>
-          </Link>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center p-2">
+            <div className="w-1 h-2 bg-white/50 rounded-full"></div>
+          </div>
         </div>
       </header>
 
