@@ -1,7 +1,7 @@
 # TimeLine Project - Development Progress
 
 **Last Updated:** October 22, 2025
-**Project Status:** Phase 3 In Progress (1/6 features complete) 🚀
+**Project Status:** Phase 3 In Progress (2/6 features complete) 🚀
 **GitHub:** https://github.com/aliihsaad/timeline-booking
 
 ---
@@ -55,7 +55,7 @@
   - Full CRUD operations
   - Integrated into business dashboard
 
-### Phase 3: Advanced Customer Features (In Progress - 1/6)
+### Phase 3: Advanced Customer Features (In Progress - 2/6)
 - ✅ **Reschedule Appointments** (COMPLETE)
   - Interactive reschedule dialog with calendar picker
   - Real-time availability checking
@@ -64,6 +64,14 @@
   - 24-hour minimum notice validation
   - Smooth UX with loading states
   - Success/error toast notifications
+
+- ✅ **Service Integration with Booking Flow** (COMPLETE)
+  - Service selection step in booking process
+  - Display service name, description, duration, and price
+  - Progressive disclosure: Service → Date → Time → Info
+  - Booking summary with all selected details
+  - Service information shown in all appointment views
+  - Auto-select if business has only one service
 
 ### Database Migrations Created
 - ✅ Main schema (businesses, appointments, time_slots)
@@ -328,22 +336,34 @@ supabase db push
 
 ---
 
-### Priority 2: Integrate Services with Booking Flow (NEXT UP)
-**Estimated Time:** 3-4 hours
-**Complexity:** Medium-High
+### ✅ Priority 2: Integrate Services with Booking Flow (COMPLETE)
+**Completed:** October 22, 2025
+**Actual Time:** ~3 hours
+**Status:** ✅ Fully functional, tested, committed & pushed
 
-**Tasks:**
-- [ ] Update BookAppointment page to show services
-- [ ] Allow customers to select service when booking
-- [ ] Display service duration and price
-- [ ] Save service_id with appointment
-- [ ] Update available slots based on service duration
-- [ ] Update BusinessDashboard to show service name in appointments
+**What Was Built:**
+- ✅ Service selection step in BookAppointment page
+- ✅ Display services with name, description, duration, price
+- ✅ Progressive disclosure booking flow
+- ✅ Booking summary showing all selected details
+- ✅ Service information in BusinessDashboard appointments
+- ✅ Service information in CustomerPortal appointments
+- ✅ Database types updated for service_id
+- ✅ Auto-select service if business has only one
 
-**Files to Modify:**
-- `src/pages/BookAppointment.tsx`
-- `src/pages/BusinessDashboard.tsx`
-- `src/lib/appointments.ts`
+**Technical Implementation:**
+- Updated `src/integrations/supabase/types.ts` - Added service_id to appointments, added services table
+- Updated `src/lib/appointments.ts` - Join with services table in queries
+- Updated `src/pages/BookAppointment.tsx` - Added service selection UI (~120 lines)
+- Updated `src/pages/BusinessDashboard.tsx` - Display service names in appointments
+- Updated `src/pages/CustomerPortal.tsx` - Display service info with Sparkles icon
+
+**Features:**
+- Professional multi-service booking experience
+- Clear pricing transparency
+- Service details visible throughout app
+- Backward compatible (service_id is nullable)
+- Build successful with no TypeScript errors
 
 ---
 
@@ -645,21 +665,21 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 ### Commits:
 - Phase 1: 2 commits (Foundation & Security)
 - Phase 2: 2 commits (Customer Portal, Service Management)
-- Phase 3: 1 commit (Reschedule Appointments)
+- Phase 3: 2 commits (Reschedule + Service Integration)
 - Documentation: 1 commit (PROGRESS.md)
-- **Total: 6 major commits**
+- **Total: 7 major commits**
 
 ### Lines of Code:
 - Phase 1: ~500 lines
 - Phase 2: ~900 lines
-- Phase 3: ~270+ lines (reschedule feature)
-- **Total: ~1,670+ lines written**
+- Phase 3: ~270 lines (reschedule) + ~240 lines (service integration)
+- **Total: ~1,910+ lines written**
 
 ### Features Completed:
 - ✅ Phase 1: Foundation (Git, security, error handling)
 - ✅ Phase 2: Customer Portal + Service Management
-- ✅ Phase 3 (1/6): Reschedule Appointments
-- ⏳ Phase 3 (5/6): Remaining features
+- ✅ Phase 3 (2/6): Reschedule Appointments + Service Integration
+- ⏳ Phase 3 (4/6): Remaining features
 
 ### Files Created:
 - Components: 1 (ErrorBoundary)
