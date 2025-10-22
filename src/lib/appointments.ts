@@ -8,11 +8,44 @@ type AppointmentUpdate = Database['public']['Tables']['appointments']['Update'];
 export const appointmentService = {
   // Create a new appointment
   async createAppointment(appointment: AppointmentInsert): Promise<{ data: Appointment | null; error: any }> {
+    // Double-check availability before inserting to prevent race conditions
+    // This catches cases where someone booked between loading slots and clicking confirm
+    const { data: existingAppointment } = await supabase
+      .from('appointments')
+      .select('id')
+      .eq('business_id', appointment.business_id)
+      .eq('appointment_date', appointment.appointment_date)
+      .eq('appointment_time', appointment.appointment_time)
+      .neq('status', 'cancelled')
+      .maybeSingle();
+
+    if (existingAppointment) {
+      return {
+        data: null,
+        error: {
+          message: 'This time slot is no longer available. Please select another time.',
+          code: 'SLOT_TAKEN'
+        }
+      };
+    }
+
+    // Proceed with insertion
     const { data, error } = await supabase
       .from('appointments')
       .insert(appointment)
       .select()
       .single();
+
+    // If insertion fails due to unique constraint (database-level protection)
+    if (error && error.code === '23505') {
+      return {
+        data: null,
+        error: {
+          message: 'This time slot was just booked by someone else. Please select another time.',
+          code: 'SLOT_TAKEN'
+        }
+      };
+    }
 
     return { data, error };
   },

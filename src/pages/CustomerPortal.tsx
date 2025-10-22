@@ -429,7 +429,7 @@ const CustomerPortal = () => {
 
         {/* Reschedule Dialog */}
         <Dialog open={showRescheduleDialog} onOpenChange={setShowRescheduleDialog}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Reschedule Appointment</DialogTitle>
               <DialogDescription>
@@ -454,13 +454,15 @@ const CustomerPortal = () => {
                 <div className="space-y-4">
                   <div>
                     <Label className="text-base font-semibold mb-3 block">Select New Date</Label>
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={handleDateSelect}
-                      disabled={(date) => date < addDays(new Date(), 1)}
-                      className="rounded-md border"
-                    />
+                    <div className="flex justify-center">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={handleDateSelect}
+                        disabled={(date) => date < addDays(new Date(), 1)}
+                        className="rounded-md border"
+                      />
+                    </div>
                   </div>
 
                   {/* Time Slot Selection */}
