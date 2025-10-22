@@ -222,12 +222,19 @@ const Index = () => {
             <p className="text-muted-foreground mb-6 text-lg">
               Join thousands of businesses using TimeLine to manage their appointments professionally
             </p>
-            <Link to="/business/login">
-              <Button size="lg" className="text-lg px-8">
-                Start Your Free Trial
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/business/login">
+                <Button size="lg" className="text-lg px-8 w-full sm:w-auto">
+                  Start Your Free Trial
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link to="/my-appointments">
+                <Button size="lg" variant="outline" className="text-lg px-8 w-full sm:w-auto">
+                  Manage My Appointments
+                </Button>
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>

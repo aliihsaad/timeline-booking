@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import BusinessLanding from "./pages/BusinessLanding";
 import BookAppointment from "./pages/BookAppointment";
 import StatusPage from "./pages/StatusPage";
+import CustomerPortal from "./pages/CustomerPortal";
 import BusinessLogin from "./pages/BusinessLogin";
 import BusinessSetup from "./pages/BusinessSetup";
 import EmailConfirmation from "./pages/EmailConfirmation";
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/b/:businessId" element={<BusinessLanding />} />
               <Route path="/book" element={<BookAppointment />} />
               <Route path="/status" element={<StatusPage />} />
+              <Route path="/my-appointments" element={<CustomerPortal />} />
               <Route path="/business/login" element={<BusinessLogin />} />
               <Route path="/business/setup" element={<BusinessSetup />} />
               <Route path="/business/confirm" element={<EmailConfirmation />} />

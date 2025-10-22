@@ -128,16 +128,33 @@ export const appointmentService = {
     return { data: availableSlots.sort(), error: null };
   },
 
+  // Get appointments by customer (phone or email)
+  async getAppointmentsByCustomer(
+    searchType: 'phone' | 'email',
+    searchValue: string
+  ): Promise<{ data: Appointment[] | null; error: any }> {
+    const field = searchType === 'phone' ? 'customer_phone' : 'customer_email';
+
+    const { data, error } = await supabase
+      .from('appointments')
+      .select('*')
+      .eq(field, searchValue)
+      .order('appointment_date', { ascending: false })
+      .order('appointment_time', { ascending: false });
+
+    return { data, error };
+  },
+
   // Get appointment statistics
-  async getAppointmentStats(businessId: string): Promise<{ 
-    data: { 
-      today: number; 
-      thisWeek: number; 
-      thisMonth: number; 
+  async getAppointmentStats(businessId: string): Promise<{
+    data: {
+      today: number;
+      thisWeek: number;
+      thisMonth: number;
       completed: number;
       cancelled: number;
-    } | null; 
-    error: any 
+    } | null;
+    error: any
   }> {
     const today = new Date().toISOString().split('T')[0];
     const weekStart = new Date();
