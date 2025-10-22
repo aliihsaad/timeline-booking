@@ -4,11 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
-import { Calendar as CalendarIcon, ArrowLeft, Phone, User, Clock } from "lucide-react";
+import { Calendar as CalendarIcon, ArrowLeft, Phone, User, Clock, DollarSign, Sparkles } from "lucide-react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { appointmentService } from "@/lib/appointments";
+import { serviceService, type Service } from "@/lib/services";
 import { useRateLimit } from "@/hooks/useRateLimit";
 import { createSecureError } from "@/utils/secureError";
 
@@ -23,7 +24,10 @@ const BookAppointment = () => {
       return;
     }
   }, [businessId, navigate]);
-  
+
+  const [services, setServices] = useState<Service[]>([]);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [loadingServices, setLoadingServices] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [formData, setFormData] = useState({
@@ -42,12 +46,47 @@ const BookAppointment = () => {
     blockMs: 10 * 60 * 1000, // 10 minutes block
   });
 
+  // Load services on mount
+  useEffect(() => {
+    if (businessId) {
+      loadServices();
+    }
+  }, [businessId]);
+
   // Load available time slots when date is selected
   useEffect(() => {
     if (selectedDate && businessId) {
       loadAvailableSlots();
     }
   }, [selectedDate, businessId]);
+
+  const loadServices = async () => {
+    if (!businessId) return;
+
+    setLoadingServices(true);
+    try {
+      const { data, error } = await serviceService.getActiveServices(businessId);
+
+      if (error) {
+        console.error('Error loading services:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load services",
+          variant: "destructive",
+        });
+      } else {
+        setServices(data || []);
+        // Auto-select if only one service
+        if (data && data.length === 1) {
+          setSelectedService(data[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading services:', error);
+    } finally {
+      setLoadingServices(false);
+    }
+  };
 
   const loadAvailableSlots = async () => {
     if (!selectedDate) return;
@@ -124,6 +163,7 @@ const BookAppointment = () => {
         customer_email: formData.email || null,
         appointment_date: format(selectedDate, 'yyyy-MM-dd'),
         appointment_time: selectedTime,
+        service_id: selectedService?.id || null,
         status: 'confirmed' as const,
       };
 
@@ -186,27 +226,85 @@ const BookAppointment = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Calendar Selection */}
+          {/* Service Selection */}
           <Card className="shadow-medium border-0">
             <CardHeader>
-              <CardTitle>Select Date</CardTitle>
+              <CardTitle>Select Service</CardTitle>
               <CardDescription>
-                Choose your preferred date
+                Choose the service you'd like to book
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                disabled={(date) => date < new Date() || date.getDay() === 0}
-                className="rounded-md border-0 shadow-soft pointer-events-auto"
-              />
+              {loadingServices ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                  <p className="text-sm text-muted-foreground">Loading services...</p>
+                </div>
+              ) : services.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No services available for booking at this time.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {services.map((service) => (
+                    <Button
+                      key={service.id}
+                      type="button"
+                      variant={selectedService?.id === service.id ? "default" : "outline"}
+                      onClick={() => setSelectedService(service)}
+                      className="h-auto p-4 justify-start text-left"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Sparkles className="w-4 h-4" />
+                          <span className="font-semibold">{service.name}</span>
+                        </div>
+                        {service.description && (
+                          <p className="text-sm opacity-80 mb-2">{service.description}</p>
+                        )}
+                        <div className="flex items-center gap-4 text-sm">
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            <span>{service.duration} min</span>
+                          </div>
+                          {service.price && (
+                            <div className="flex items-center gap-1">
+                              <DollarSign className="w-3 h-3" />
+                              <span>${service.price}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </Button>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
+          {/* Calendar Selection */}
+          {selectedService && (
+            <Card className="shadow-medium border-0">
+              <CardHeader>
+                <CardTitle>Select Date</CardTitle>
+                <CardDescription>
+                  Choose your preferred date
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  disabled={(date) => date < new Date() || date.getDay() === 0}
+                  className="rounded-md border-0 shadow-soft pointer-events-auto"
+                />
+              </CardContent>
+            </Card>
+          )}
+
           {/* Time Selection */}
-          {selectedDate && (
+          {selectedService && selectedDate && (
             <Card className="shadow-medium border-0">
               <CardHeader>
                 <CardTitle>Select Time</CardTitle>
@@ -245,7 +343,7 @@ const BookAppointment = () => {
           )}
 
           {/* Customer Information */}
-          {selectedTime && (
+          {selectedService && selectedTime && (
             <Card className="shadow-medium border-0">
               <CardHeader>
                 <CardTitle>Your Information</CardTitle>
@@ -299,10 +397,39 @@ const BookAppointment = () => {
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
-                  variant="default" 
-                  size="xl" 
+                {/* Booking Summary */}
+                <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                  <h4 className="font-semibold text-sm mb-3">Booking Summary</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Service:</span>
+                      <span className="font-medium">{selectedService?.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Duration:</span>
+                      <span className="font-medium">{selectedService?.duration} minutes</span>
+                    </div>
+                    {selectedService?.price && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Price:</span>
+                        <span className="font-medium">${selectedService.price}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Date:</span>
+                      <span className="font-medium">{selectedDate && format(selectedDate, 'PPP')}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Time:</span>
+                      <span className="font-medium">{selectedTime}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  variant="default"
+                  size="xl"
                   className="w-full mt-6"
                   disabled={isLoading}
                 >

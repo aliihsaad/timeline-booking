@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Calendar as CalendarIcon, Clock, User, Mail, Phone, Search, XCircle, RefreshCw, ArrowLeft, ArrowRight } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, User, Mail, Phone, Search, XCircle, RefreshCw, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import { appointmentService } from "@/lib/appointments";
@@ -356,6 +356,16 @@ const CustomerPortal = () => {
                               <User className="w-4 h-4 text-muted-foreground" />
                               <span className="font-medium">{appointment.customer_name}</span>
                             </div>
+
+                            {(appointment as any).services && (
+                              <div className="flex items-center gap-2 text-sm">
+                                <Sparkles className="w-4 h-4 text-primary" />
+                                <span className="font-medium text-primary">{(appointment as any).services.name}</span>
+                                {(appointment as any).services.duration && (
+                                  <span className="text-muted-foreground">({(appointment as any).services.duration} min)</span>
+                                )}
+                              </div>
+                            )}
 
                             <div className="flex items-center gap-2 text-sm">
                               <Calendar className="w-4 h-4 text-muted-foreground" />

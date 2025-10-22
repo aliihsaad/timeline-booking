@@ -18,10 +18,19 @@ export const appointmentService = {
   },
 
   // Get appointments for a business
-  async getBusinessAppointments(businessId: string, date?: string): Promise<{ data: Appointment[] | null; error: any }> {
+  async getBusinessAppointments(businessId: string, date?: string): Promise<{ data: any[] | null; error: any }> {
     let query = supabase
       .from('appointments')
-      .select('*')
+      .select(`
+        *,
+        services (
+          id,
+          name,
+          description,
+          duration,
+          price
+        )
+      `)
       .eq('business_id', businessId)
       .order('appointment_date', { ascending: true })
       .order('appointment_time', { ascending: true });
@@ -132,12 +141,21 @@ export const appointmentService = {
   async getAppointmentsByCustomer(
     searchType: 'phone' | 'email',
     searchValue: string
-  ): Promise<{ data: Appointment[] | null; error: any }> {
+  ): Promise<{ data: any[] | null; error: any }> {
     const field = searchType === 'phone' ? 'customer_phone' : 'customer_email';
 
     const { data, error } = await supabase
       .from('appointments')
-      .select('*')
+      .select(`
+        *,
+        services (
+          id,
+          name,
+          description,
+          duration,
+          price
+        )
+      `)
       .eq(field, searchValue)
       .order('appointment_date', { ascending: false })
       .order('appointment_time', { ascending: false });

@@ -25,6 +25,7 @@ export type Database = {
           customer_phone: string
           id: string
           notes: string | null
+          service_id: string | null
           status: string | null
           updated_at: string
         }
@@ -38,6 +39,7 @@ export type Database = {
           customer_phone: string
           id?: string
           notes?: string | null
+          service_id?: string | null
           status?: string | null
           updated_at?: string
         }
@@ -51,6 +53,7 @@ export type Database = {
           customer_phone?: string
           id?: string
           notes?: string | null
+          service_id?: string | null
           status?: string | null
           updated_at?: string
         }
@@ -60,6 +63,13 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
             referencedColumns: ["id"]
           },
         ]
@@ -105,6 +115,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      services: {
+        Row: {
+          business_id: string
+          created_at: string
+          description: string | null
+          duration: number
+          id: string
+          is_active: boolean
+          name: string
+          price: number | null
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          description?: string | null
+          duration?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          description?: string | null
+          duration?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          price?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       time_slots: {
         Row: {

@@ -698,6 +698,9 @@ const BusinessDashboard = () => {
                           </div>
                           <div>
                             <h4 className="font-semibold text-base">{appointment.customer_name}</h4>
+                            {(appointment as any).services && (
+                              <p className="text-sm text-primary font-medium">{(appointment as any).services.name}</p>
+                            )}
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
@@ -849,6 +852,9 @@ const BusinessDashboard = () => {
                         </div>
                         <div>
                           <h4 className="font-semibold text-base">{appointment.customer_name}</h4>
+                          {(appointment as any).services && (
+                            <p className="text-sm text-primary font-medium">{(appointment as any).services.name}</p>
+                          )}
                           <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
