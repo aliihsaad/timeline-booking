@@ -1,16 +1,30 @@
-# Fix: "Business Not Found" Error (QR Code & Booking Links)
+# Fix: Common Booking Errors (QR Code & Time Slots)
 
-## Problem
+## Problems Fixed
+
+### Problem 1: "Business Not Found" Error
 When customers scan QR codes or click booking links, they see:
 - ❌ "Business not found" error
 - ❌ HTTP 406 error in browser console
 - ❌ Cannot access business landing page
 
+### Problem 2: "No Available Slots" Error
+When customers try to book appointments, they see:
+- ❌ "No available slots for this date" (for any date selected)
+- ❌ Time slot picker shows no options
+- ❌ Cannot complete booking
+
 ## Root Cause
-The Row Level Security (RLS) policy on the `businesses` table was too restrictive. It only allowed authenticated business owners to view their business data, blocking unauthenticated customers from viewing business profiles.
+Both issues are caused by overly restrictive Row Level Security (RLS) policies:
+1. **businesses table** - Only allowed authenticated business owners to view businesses
+2. **time_slots table** - Only allowed authenticated business owners to view time slots
+
+This blocked unauthenticated customers from viewing business profiles and available booking times.
 
 ## Solution
-Apply the migration file `20250102000001_fix_business_public_access.sql` to allow public read access to business profiles.
+Apply TWO migration files to allow public read access:
+1. `20250102000001_fix_business_public_access.sql` - Allows public to view businesses
+2. `20250102000002_fix_timeslots_public_access.sql` - Allows public to view time slots
 
 ---
 
@@ -26,46 +40,63 @@ Apply the migration file `20250102000001_fix_business_public_access.sql` to allo
    - Click on "SQL Editor" in the left sidebar
    - Click "+ New query"
 
-3. **Paste the SQL**
+3. **Paste BOTH SQL Fixes** (copy everything below)
    ```sql
-   -- Fix RLS policy to allow public access to business profiles
+   -- Fix 1: Allow public access to business profiles
    DROP POLICY IF EXISTS "Users can view their own business" ON public.businesses;
 
    CREATE POLICY "Public can view businesses"
      ON public.businesses
      FOR SELECT
      USING (true);
+
+   -- Fix 2: Allow public access to time slots
+   CREATE POLICY "Public can view time slots"
+     ON public.time_slots
+     FOR SELECT
+     USING (true);
    ```
 
-4. **Run the Query**
+4. **Run Both Queries**
    - Click "Run" button (or press Ctrl+Enter)
-   - You should see: "Success. No rows returned"
+   - You should see: "Success. No rows returned" (may appear twice)
 
 5. **Test Immediately**
    - Refresh your browser
-   - Try the QR code/booking link again
-   - Should work now! ✅
+   - Try the QR code/booking link → Business page loads ✅
+   - Try booking → Select service → Pick date → Time slots appear ✅
 
 ---
 
-### Option 2: Using Migration File (Organized approach - 5 minutes)
+### Option 2: Using Migration Files (Organized approach - 5 minutes)
 
 If you want to keep this as a proper migration in your database history:
 
-1. **The migration file already exists:**
-   `supabase/migrations/20250102000001_fix_business_public_access.sql`
+1. **TWO migration files exist:**
+   - `supabase/migrations/20250102000001_fix_business_public_access.sql`
+   - `supabase/migrations/20250102000002_fix_timeslots_public_access.sql`
 
-2. **Apply it in Supabase Dashboard:**
+2. **Apply BOTH in Supabase Dashboard:**
    - Go to Supabase Dashboard → SQL Editor
    - Click "+ New query"
-   - Open the file `supabase/migrations/20250102000001_fix_business_public_access.sql`
-   - Copy the entire content
+
+   **First Migration:**
+   - Open file `supabase/migrations/20250102000001_fix_business_public_access.sql`
+   - Copy entire content
    - Paste into SQL Editor
    - Click "Run"
 
-3. **Verify Migration**
+   **Second Migration:**
+   - Click "+ New query" again
+   - Open file `supabase/migrations/20250102000002_fix_timeslots_public_access.sql`
+   - Copy entire content
+   - Paste into SQL Editor
+   - Click "Run"
+
+3. **Verify Migrations**
    - Go to Database → Policies
-   - Check that `public.businesses` has a policy named "Public can view businesses"
+   - Check `public.businesses` has policy: "Public can view businesses"
+   - Check `public.time_slots` has policy: "Public can view time slots"
 
 ---
 
