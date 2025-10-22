@@ -904,14 +904,24 @@ const BusinessDashboard = () => {
         </Dialog>
 
         {/* Premium Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="glass border-0 shadow-luxury hover-glow cursor-pointer" onClick={() => navigate('/business/services')}>
+            <CardContent className="p-8 text-center">
+              <div className="bg-gradient-accent text-white rounded-2xl w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Star className="w-8 h-8" />
+              </div>
+              <h3 className="font-bold text-lg mb-2 gradient-text">Manage Services</h3>
+              <p className="text-muted-foreground text-sm">Add and edit service offerings</p>
+            </CardContent>
+          </Card>
+
           <Card className="glass border-0 shadow-luxury hover-glow cursor-pointer" onClick={() => setShowCalendarDialog(true)}>
             <CardContent className="p-8 text-center">
               <div className="bg-gradient-primary text-white rounded-2xl w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Calendar className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-lg mb-2 gradient-text">Manage Calendar</h3>
-              <p className="text-muted-foreground text-sm">Configure business hours and availability</p>
+              <p className="text-muted-foreground text-sm">Configure business hours</p>
             </CardContent>
           </Card>
 
@@ -921,7 +931,7 @@ const BusinessDashboard = () => {
                 <Eye className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-lg mb-2 gradient-text">All Appointments</h3>
-              <p className="text-muted-foreground text-sm">View and manage all bookings</p>
+              <p className="text-muted-foreground text-sm">View all bookings</p>
             </CardContent>
           </Card>
 
@@ -931,7 +941,7 @@ const BusinessDashboard = () => {
                 <Settings className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-lg mb-2 gradient-text">Business Settings</h3>
-              <p className="text-muted-foreground text-sm">Update profile and preferences</p>
+              <p className="text-muted-foreground text-sm">Update profile</p>
             </CardContent>
           </Card>
         </div>

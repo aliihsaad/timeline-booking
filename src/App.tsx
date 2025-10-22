@@ -15,6 +15,7 @@ import BusinessSetup from "./pages/BusinessSetup";
 import EmailConfirmation from "./pages/EmailConfirmation";
 import BusinessDashboard from "./pages/BusinessDashboard";
 import BusinessSettings from "./pages/BusinessSettings";
+import ServiceManagement from "./pages/ServiceManagement";
 import ForgotPassword from "./pages/ForgotPassword";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import NotFound from "./pages/NotFound";
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/business/confirm" element={<EmailConfirmation />} />
               <Route path="/business/dashboard" element={<BusinessDashboard />} />
               <Route path="/business/settings" element={<BusinessSettings />} />
+              <Route path="/business/services" element={<ServiceManagement />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/terms" element={<TermsAndConditions />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
