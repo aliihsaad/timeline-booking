@@ -145,6 +145,42 @@ export const appointmentService = {
     return { data, error };
   },
 
+  // Reschedule an appointment
+  async rescheduleAppointment(
+    appointmentId: string,
+    newDate: string,
+    newTime: string,
+    businessId: string
+  ): Promise<{ data: Appointment | null; error: any }> {
+    // First, check if the new slot is available
+    const { data: availableSlots, error: slotsError } = await this.getAvailableSlots(businessId, newDate);
+
+    if (slotsError) {
+      return { data: null, error: slotsError };
+    }
+
+    if (!availableSlots?.includes(newTime)) {
+      return {
+        data: null,
+        error: { message: 'Selected time slot is not available' }
+      };
+    }
+
+    // Update the appointment
+    const { data, error } = await supabase
+      .from('appointments')
+      .update({
+        appointment_date: newDate,
+        appointment_time: newTime,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', appointmentId)
+      .select()
+      .single();
+
+    return { data, error };
+  },
+
   // Get appointment statistics
   async getAppointmentStats(businessId: string): Promise<{
     data: {

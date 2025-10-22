@@ -4,10 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, User, Mail, Phone, Search, XCircle, RefreshCw, ArrowLeft } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Calendar as CalendarIcon, Clock, User, Mail, Phone, Search, XCircle, RefreshCw, ArrowLeft, ArrowRight } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import { appointmentService } from "@/lib/appointments";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
 import { Link } from "react-router-dom";
 
@@ -19,6 +21,13 @@ const CustomerPortal = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [showRescheduleDialog, setShowRescheduleDialog] = useState(false);
+  const [reschedulingAppointment, setReschedulingAppointment] = useState<Appointment | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [selectedTime, setSelectedTime] = useState<string>('');
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [rescheduling, setRescheduling] = useState(false);
   const { toast } = useToast();
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -101,6 +110,114 @@ const CustomerPortal = () => {
         description: "Failed to cancel appointment",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleOpenReschedule = (appointment: Appointment) => {
+    setReschedulingAppointment(appointment);
+    setSelectedDate(undefined);
+    setSelectedTime('');
+    setAvailableSlots([]);
+    setShowRescheduleDialog(true);
+  };
+
+  const handleDateSelect = async (date: Date | undefined) => {
+    setSelectedDate(date);
+    setSelectedTime('');
+
+    if (!date || !reschedulingAppointment) return;
+
+    setLoadingSlots(true);
+    try {
+      const dateString = format(date, 'yyyy-MM-dd');
+      const { data: slots, error } = await appointmentService.getAvailableSlots(
+        reschedulingAppointment.business_id,
+        dateString
+      );
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load available time slots",
+          variant: "destructive",
+        });
+        setAvailableSlots([]);
+        return;
+      }
+
+      setAvailableSlots(slots || []);
+
+      if (!slots || slots.length === 0) {
+        toast({
+          title: "No Slots Available",
+          description: "No time slots available for this date. Please choose another date.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load time slots",
+        variant: "destructive",
+      });
+      setAvailableSlots([]);
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
+
+  const handleConfirmReschedule = async () => {
+    if (!reschedulingAppointment || !selectedDate || !selectedTime) {
+      toast({
+        title: "Missing Information",
+        description: "Please select both date and time",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setRescheduling(true);
+    try {
+      const newDateString = format(selectedDate, 'yyyy-MM-dd');
+      const { data, error } = await appointmentService.rescheduleAppointment(
+        reschedulingAppointment.id,
+        newDateString,
+        selectedTime,
+        reschedulingAppointment.business_id
+      );
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to reschedule appointment",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update the appointment in the list
+      setAppointments(prev =>
+        prev.map(apt =>
+          apt.id === reschedulingAppointment.id
+            ? { ...apt, appointment_date: newDateString, appointment_time: selectedTime }
+            : apt
+        )
+      );
+
+      toast({
+        title: "Appointment Rescheduled",
+        description: `Your appointment has been moved to ${format(selectedDate, 'MMMM do, yyyy')} at ${selectedTime}`,
+      });
+
+      setShowRescheduleDialog(false);
+      setReschedulingAppointment(null);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to reschedule appointment",
+        variant: "destructive",
+      });
+    } finally {
+      setRescheduling(false);
     }
   };
 
@@ -265,10 +382,10 @@ const CustomerPortal = () => {
                                 variant="outline"
                                 size="sm"
                                 className="w-full"
-                                disabled
+                                onClick={() => handleOpenReschedule(appointment)}
                               >
                                 <RefreshCw className="w-4 h-4 mr-2" />
-                                Reschedule (Coming Soon)
+                                Reschedule
                               </Button>
                               <Button
                                 variant="destructive"
@@ -299,6 +416,121 @@ const CustomerPortal = () => {
             )}
           </div>
         )}
+
+        {/* Reschedule Dialog */}
+        <Dialog open={showRescheduleDialog} onOpenChange={setShowRescheduleDialog}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Reschedule Appointment</DialogTitle>
+              <DialogDescription>
+                Select a new date and time for your appointment
+              </DialogDescription>
+            </DialogHeader>
+
+            {reschedulingAppointment && (
+              <div className="space-y-6">
+                {/* Current Appointment Info */}
+                <Card className="bg-muted/50">
+                  <CardContent className="p-4">
+                    <div className="text-sm space-y-1">
+                      <p className="font-semibold">Current Appointment:</p>
+                      <p>{format(new Date(reschedulingAppointment.appointment_date), 'EEEE, MMMM do, yyyy')}</p>
+                      <p>Time: {reschedulingAppointment.appointment_time}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* New Date Selection */}
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-base font-semibold mb-3 block">Select New Date</Label>
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={handleDateSelect}
+                      disabled={(date) => date < addDays(new Date(), 1)}
+                      className="rounded-md border"
+                    />
+                  </div>
+
+                  {/* Time Slot Selection */}
+                  {selectedDate && (
+                    <div>
+                      <Label className="text-base font-semibold mb-3 block">
+                        Select New Time
+                        {selectedDate && (
+                          <span className="text-sm font-normal text-muted-foreground ml-2">
+                            for {format(selectedDate, 'MMMM do, yyyy')}
+                          </span>
+                        )}
+                      </Label>
+
+                      {loadingSlots ? (
+                        <div className="flex items-center justify-center p-8">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        </div>
+                      ) : availableSlots.length > 0 ? (
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto p-1">
+                          {availableSlots.map((slot) => (
+                            <Button
+                              key={slot}
+                              variant={selectedTime === slot ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setSelectedTime(slot)}
+                              className="h-10"
+                            >
+                              {slot}
+                            </Button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center p-8 bg-muted/50 rounded-lg">
+                          <p className="text-sm text-muted-foreground">
+                            No available time slots for this date
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* New Appointment Summary */}
+                  {selectedDate && selectedTime && (
+                    <Card className="bg-primary/5 border-primary/20">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 text-sm">
+                          <ArrowRight className="w-4 h-4 text-primary" />
+                          <div>
+                            <p className="font-semibold">New Appointment:</p>
+                            <p>{format(selectedDate, 'EEEE, MMMM do, yyyy')} at {selectedTime}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowRescheduleDialog(false)}
+                    className="flex-1"
+                    disabled={rescheduling}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleConfirmReschedule}
+                    className="flex-1"
+                    disabled={!selectedDate || !selectedTime || rescheduling}
+                  >
+                    {rescheduling ? 'Rescheduling...' : 'Confirm Reschedule'}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
